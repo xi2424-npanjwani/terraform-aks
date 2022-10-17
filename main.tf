@@ -8,7 +8,7 @@ provider "azurerm" {
 # AKS MODULE
 
 module "aks_cluster" {
-  source                                  = "./module/terraform-azurerm-aks"
+  source                                  = "./module/terraform-azurerm-aks-6.1.0"
   prefix                                  = var.prefix
   resource_group_name                     = var.resource_group_name
   aci_connector_linux_enabled             = var.aci_connector_linux_enabled
