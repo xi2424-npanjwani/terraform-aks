@@ -100,19 +100,19 @@ variable "azure_policy_enabled" {
   default     = true
 }
 
-# variable "client_id" {
-#   type        = string
-#   description = "(Optional) The Client ID (appId) for the Service Principal used for the AKS deployment"
-#   default     = null
-#   nullable    = false
-# }
+variable "client_id" {
+  type        = string
+  description = "(Optional) The Client ID (appId) for the Service Principal used for the AKS deployment"
+  default     = null
+  nullable    = true
+}
 
-# variable "client_secret" {
-#   type        = string
-#   description = "(Optional) The Client Secret (password) for the Service Principal used for the AKS deployment"
-#   default     = null
-#   nullable    = false
-# }
+variable "client_secret" {
+  type        = string
+  description = "(Optional) The Client Secret (password) for the Service Principal used for the AKS deployment"
+  default     = null
+  nullable    = true
+}
 
 variable "cluster_log_analytics_workspace_name" {
   type        = string
@@ -156,22 +156,22 @@ variable "http_application_routing_enabled" {
   default     = false
 }
 
-# variable "identity_ids" {
-#   type        = list(string)
-#   description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster."
-#   default     = null
-# }
+variable "identity_ids" {
+  type        = list(string)
+  description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster."
+  default     = null
+}
 
-# variable "identity_type" {
-#   type        = string
-#   description = "(Optional) The type of identity used for the managed cluster. Conflict with `client_id` and `client_secret`. Possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned`(to enable both). If `UserAssigned` or `SystemAssigned, UserAssigned` is set, an `identity_ids` must be set as well."
-#   default     = "SystemAssigned"
+variable "identity_type" {
+  type        = string
+  description = "(Optional) The type of identity used for the managed cluster. Conflict with `client_id` and `client_secret`. Possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned`(to enable both). If `UserAssigned` or `SystemAssigned, UserAssigned` is set, an `identity_ids` must be set as well."
+  default     = null
 
-#   validation {
-#     condition     = var.identity_type == "SystemAssigned" || var.identity_type == "UserAssigned" || var.identity_type == "SystemAssigned, UserAssigned"
-#     error_message = "`identity_type`'s possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned`(to enable both)."
-#   }
-# }
+  validation {
+    condition     = var.identity_type == "SystemAssigned" || var.identity_type == "UserAssigned" || var.identity_type == "SystemAssigned, UserAssigned"
+    error_message = "`identity_type`'s possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned`(to enable both)."
+  }
+}
 
 variable "ingress_application_gateway_enabled" {
   type        = bool
@@ -229,22 +229,22 @@ variable "location" {
   default     = null
 }
 
-# variable "log_analytics_solution_id" {
-#   type        = string
-#   description = "(Optional) Existing azurerm_log_analytics_solution ID. Providing ID disables creation of azurerm_log_analytics_solution."
-#   default     = null
-#   nullable    = true
-# }
+variable "log_analytics_solution_id" {
+  type        = string
+  description = "(Optional) Existing azurerm_log_analytics_solution ID. Providing ID disables creation of azurerm_log_analytics_solution."
+  default     = null
+  nullable    = true
+}
 
-# variable "log_analytics_workspace" {
-#   type = object({
-#     id   = string
-#     name = string
-#   })
-#   description = "(Optional) Existing azurerm_log_analytics_workspace to attach azurerm_log_analytics_solution. Providing the config disables creation of azurerm_log_analytics_workspace."
-#   default     = null
-#   nullable    = true
-# }
+variable "log_analytics_workspace" {
+  type = object({
+    id   = string
+    name = string
+  })
+  description = "(Optional) Existing azurerm_log_analytics_workspace to attach azurerm_log_analytics_solution. Providing the config disables creation of azurerm_log_analytics_workspace."
+  default     = null
+  nullable    = true
+}
 
 variable "log_analytics_workspace_enabled" {
   type        = bool
@@ -260,17 +260,17 @@ variable "log_analytics_workspace_resource_group_name" {
   nullable    = true
 }
 
-# variable "log_analytics_workspace_sku" {
-#   type        = string
-#   description = "The SKU (pricing level) of the Log Analytics workspace. For new subscriptions the SKU should be set to PerGB2018"
-#   default     = "PerGB2018"
-# }
+variable "log_analytics_workspace_sku" {
+  type        = string
+  description = "The SKU (pricing level) of the Log Analytics workspace. For new subscriptions the SKU should be set to PerGB2018"
+  default     = "PerGB2018"
+}
 
-# variable "log_retention_in_days" {
-#   type        = number
-#   description = "The retention period for the logs in days"
-#   default     = 30
-# }
+variable "log_retention_in_days" {
+  type        = number
+  description = "The retention period for the logs in days"
+  default     = 30
+}
 
 variable "microsoft_defender_enabled" {
   type        = bool
@@ -380,7 +380,8 @@ variable "private_cluster_public_fqdn_enabled" {
 variable "private_dns_zone_id" {
   type        = string
   description = "(Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster, `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving, otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created."
-  default     = "System"
+  default     = null
+  nullable    = true
 }
 
 variable "public_ssh_key" {
