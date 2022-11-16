@@ -1,4 +1,4 @@
-prefix = "prefix"
+#PUBLIC CLUSTER EXAMPLE
 # admin_username                    = "azureuser"
 private_cluster_enabled                     = false
 role_based_access_control_enabled           = true
@@ -12,7 +12,7 @@ key_vault_secrets_provider_enabled          = true
 ingress_application_gateway_enabled         = false
 identity_type                               = "SystemAssigned"
 enable_auto_scaling                         = true
-cluster_name                                = "tf-poc-1"
+cluster_name                                = "tf-poc"
 azure_policy_enabled                        = true
 agents_type                                 = "VirtualMachineScaleSets"
 agents_size                                 = "Standard_D4_v3"
@@ -31,4 +31,4 @@ network_plugin                              = "azure"
 network_policy                              = "azure"
 log_analytics_workspace                     = null
 log_analytics_solution_id                   = null
-api_server_authorized_ip_ranges             = ["122.161.51.19"] # (local_ip)
+api_server_authorized_ip_ranges             = ["122.xxx.yy.zz"] # (local_ip)
