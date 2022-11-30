@@ -42,7 +42,6 @@ module "aks_cluster" {
   ingress_application_gateway_subnet_cidr     = var.ingress_application_gateway_subnet_cidr
   ingress_application_gateway_subnet_id       = var.ingress_application_gateway_subnet_id
   key_vault_secrets_provider_enabled          = var.key_vault_secrets_provider_enabled
-  kubernetes_version                          = var.kubernetes_version
   local_account_disabled                      = var.local_account_disabled
   location                                    = var.location
   log_analytics_solution_id                   = var.log_analytics_solution_id
@@ -83,5 +82,5 @@ module "aks_cluster" {
   sku_tier                                    = var.sku_tier
   tags                                        = var.tags
   vnet_subnet_id                              = var.vnet_subnet_id
-
+  additional_node_groups                      = var.additional_node_groups
 }

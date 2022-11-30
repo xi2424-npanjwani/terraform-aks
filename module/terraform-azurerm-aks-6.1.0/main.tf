@@ -2,6 +2,12 @@ data "azurerm_resource_group" "main" {
   name = var.resource_group_name
 }
 
+data "azurerm_kubernetes_service_versions" "current" {
+  location = var.location
+  include_preview = false  
+}
+
+
 moved {
   from = module.ssh-key.tls_private_key.ssh
   to   = tls_private_key.ssh[0]
@@ -23,7 +29,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   disk_encryption_set_id              = var.disk_encryption_set_id
   dns_prefix                          = var.prefix
   http_application_routing_enabled    = var.http_application_routing_enabled
-  kubernetes_version                  = var.kubernetes_version
+  kubernetes_version                  = data.azurerm_kubernetes_service_versions.current.latest_version
   local_account_disabled              = var.local_account_disabled
   node_resource_group                 = var.node_resource_group
   oidc_issuer_enabled                 = var.oidc_issuer_enabled
@@ -57,6 +63,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       type                         = var.agents_type
       vnet_subnet_id               = var.vnet_subnet_id
       zones                        = var.agents_availability_zones
+      # node_taints                  = var.agents_node_taints
     }
   }
   dynamic "default_node_pool" {
@@ -80,8 +87,10 @@ resource "azurerm_kubernetes_cluster" "main" {
       type                         = var.agents_type
       vnet_subnet_id               = var.vnet_subnet_id
       zones                        = var.agents_availability_zones
+      # node_taints                  = var.agents_node_taints
     }
   }
+
   dynamic "aci_connector_linux" {
     for_each = var.aci_connector_linux_enabled ? ["aci_connector_linux"] : []
 
@@ -191,6 +200,28 @@ resource "azurerm_kubernetes_cluster" "main" {
       error_message = "If use identity and `UserAssigned` or `SystemAssigned, UserAssigned` is set, an `identity_ids` must be set as well."
     }
   }
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "additional_node_pool" {
+  count = length(var.additional_node_groups)
+  enable_auto_scaling          = var.additional_node_groups[count.index].enable_auto_scaling
+  name                         = var.additional_node_groups[count.index].name
+  kubernetes_cluster_id        = azurerm_kubernetes_cluster.main.id
+  vm_size                      = var.additional_node_groups[count.index].vm_size
+  enable_node_public_ip = var.additional_node_groups[count.index].enable_node_public_ip
+  node_count                   = var.additional_node_groups[count.index].node_count
+  max_count                    = var.additional_node_groups[count.index].max_count
+  min_count                    = var.additional_node_groups[count.index].min_count
+  enable_host_encryption       = var.additional_node_groups[count.index].enable_host_encryption
+  vnet_subnet_id               = var.vnet_subnet_id
+  zones                        = var.agents_availability_zones
+  os_type = var.additional_node_groups[count.index].os_type
+  os_sku = var.additional_node_groups[count.index].os_sku
+  max_pods                     = var.additional_node_groups[count.index].max_pods
+  node_labels                  = var.additional_node_groups[count.index].node_labels
+  os_disk_size_gb              = var.additional_node_groups[count.index].os_disk_size_gb
+  os_disk_type                 = var.additional_node_groups[count.index].os_disk_type
+  node_taints = var.additional_node_groups[count.index].node_taints
 }
 
 resource "azurerm_log_analytics_workspace" "main" {

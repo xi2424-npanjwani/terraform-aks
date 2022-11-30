@@ -87,6 +87,13 @@ variable "agents_type" {
   default     = "VirtualMachineScaleSets"
 }
 
+# variable "agents_node_taints" {
+#   type        = list(string)
+#   default     = [""]
+#   description = "A list of Kubernetes taints which should be applied to nodes in the agent pool"
+# }
+
+
 variable "api_server_authorized_ip_ranges" {
   type        = set(string)
   description = "(Optional) The IP ranges to allow for incoming traffic to the server nodes."
@@ -468,4 +475,42 @@ variable "vnet_subnet_id" {
   type        = string
   description = "(Optional) The ID of a Subnet where the Kubernetes Node Pool should exist. Changing this forces a new resource to be created."
   default     = null
+}
+
+variable "additional_node_groups" {
+  description = "Map of AKS manuallyscaled node group definitions to create"
+  type = list(object({
+    name           = string
+    vm_size   = string
+    node_count   = number
+    enable_host_encryption = bool
+    enable_node_public_ip  = bool
+    node_labels         = map(string)
+    os_type          = string
+    os_sku = string
+    enable_auto_scaling = bool
+    max_count = number
+    min_count = number
+    os_disk_type = string
+    os_disk_size_gb = number
+    max_pods = number
+    node_taints = list(string)
+  }))
+  default = [{
+    name           = "addnodeauto"
+    vm_size   = "Standard_DS2_v2"
+    node_count   = 1
+    enable_host_encryption = false
+    enable_node_public_ip  = false
+    node_labels         = {}
+    os_type          = "Linux"
+    os_sku = "Ubuntu"
+    enable_auto_scaling = false
+    max_count = null
+    min_count = null
+    os_disk_type = "Managed"
+    os_disk_size_gb = 50
+    node_taints = [""]
+    max_pods = 100
+  }]
 }

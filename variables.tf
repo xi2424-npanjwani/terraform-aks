@@ -15,7 +15,7 @@ variable "cluster_name" {
 
 variable "node_resource_group" {
   type        = string
-  description = "The auto-generated Resource Group which contains the resources for this Managed Kubernetes Cluster. Changing this forces a new resource to be created."
+  description = "The generated Resource Group which contains the resources for this Managed Kubernetes Cluster. Changing this forces a new resource to be created."
   default     = null
 }
 
@@ -39,7 +39,7 @@ variable "api_server_authorized_ip_ranges" {
 
 variable "prefix" {
   type        = string
-  description = "(Required) The prefix for the resources created in the specified Azure Resource Group"
+  description = "The dns_prefix used"
   default     = "prefix"
 }
 
@@ -58,8 +58,7 @@ variable "http_application_routing_enabled" {
 variable "role_based_access_control_enabled" {
   type        = bool
   description = "Enable Role Based Access Control."
-  default     = false
-  nullable    = false
+  default     = true
 }
 
 variable "oidc_issuer_enabled" {
@@ -100,7 +99,7 @@ variable "orchestrator_version" {
 variable "local_account_disabled" {
   type        = bool
   description = "(Optional) - If `true` local accounts will be disabled. Defaults to `false`. See [the documentation](https://docs.microsoft.com/azure/aks/managed-aad#disable-local-accounts) for more information."
-  default     = null
+  default     = false
 }
 
 variable "only_critical_addons_enabled" {
@@ -132,7 +131,7 @@ variable "aci_connector_linux_subnet_name" {
 variable "azure_policy_enabled" {
   type        = bool
   description = "Enable Azure Policy Addon."
-  default     = true
+  default     = false
 }
 
 #DEFAULT_NODE_POOL
@@ -259,7 +258,7 @@ variable "identity_ids" {
 variable "identity_type" {
   type        = string
   description = "(Optional) The type of identity used for the managed cluster. Conflict with `client_id` and `client_secret`. Possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned`(to enable both). If `UserAssigned` or `SystemAssigned, UserAssigned` is set, an `identity_ids` must be set as well."
-  default     = null
+  default     = "SystemAssigned"
 
   validation {
     condition     = var.identity_type == "SystemAssigned" || var.identity_type == "UserAssigned" || var.identity_type == "SystemAssigned, UserAssigned"
@@ -333,26 +332,25 @@ variable "secret_rotation_interval" {
 variable "network_plugin" {
   type        = string
   description = "Network plugin to use for networking."
-  default     = "kubenet"
-  nullable    = false
+  default     = "azure"
 }
 
 variable "network_policy" {
   type        = string
   description = " (Optional) Sets up network policy to be used with Azure CNI. Network policy allows us to control the traffic flow between pods. Currently supported values are calico and azure. Changing this forces a new resource to be created."
-  default     = null
+  default     = "calico"
 }
 
 variable "net_profile_dns_service_ip" {
   type        = string
   description = "(Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created."
-  default     = null
+  default     = "172.16.0.10"
 }
 
 variable "net_profile_docker_bridge_cidr" {
   type        = string
   description = "(Optional) IP address (in CIDR notation) used as the Docker bridge IP address on nodes. Changing this forces a new resource to be created."
-  default     = null
+  default     = "172.16.4.1/22"
 }
 
 variable "net_profile_outbound_type" {
@@ -370,7 +368,7 @@ variable "net_profile_pod_cidr" {
 variable "net_profile_service_cidr" {
   type        = string
   description = "(Optional) The Network Range used by the Kubernetes service. Changing this forces a new resource to be created."
-  default     = null
+  default     = "172.16.0.0/22"
 }
 
 variable "private_dns_zone_id" {
@@ -410,7 +408,7 @@ variable "rbac_aad_admin_group_object_ids" {
 variable "rbac_aad_azure_rbac_enabled" {
   type        = bool
   description = "(Optional) Is Role Based Access Control based on Azure AD enabled?"
-  default     = null
+  default     = true
 }
 
 variable "rbac_aad_client_app_id" {
@@ -484,4 +482,44 @@ variable "log_retention_in_days" {
   type        = number
   description = "The retention period for the logs in days"
   default     = 30
+}
+
+variable "additional_node_groups" {
+  description = "Map of AKS node group definitions to create"
+  type = list(object({
+    name                   = string
+    vm_size                = string
+    node_count             = number
+    enable_host_encryption = bool
+    enable_node_public_ip  = bool
+    node_labels            = map(string)
+    os_type                = string
+    os_sku                 = string
+    enable_auto_scaling    = bool
+    max_count              = number
+    min_count              = number
+    os_disk_type           = string
+    os_disk_size_gb        = number
+    max_pods               = number
+    node_taints            = list(string)
+  }))
+  default = [
+    #{
+    #   name                   = "addnodeauto"
+    #   vm_size                = "Standard_DS2_v2"
+    #   node_count             = 1
+    #   enable_host_encryption = false
+    #   enable_node_public_ip  = false
+    #   node_labels            = {}
+    #   os_type                = "Linux"
+    #   os_sku                 = "Ubuntu"
+    #   enable_auto_scaling    = false
+    #   max_count              = null
+    #   min_count              = null
+    #   os_disk_type           = "Managed"
+    #   os_disk_size_gb        = 50
+    #   node_taints            = [""]
+    #   max_pods               = 100
+    # }
+  ]
 }
