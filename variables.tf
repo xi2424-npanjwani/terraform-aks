@@ -504,22 +504,5 @@ variable "additional_node_groups" {
     node_taints            = list(string)
   }))
   default = [
-    #{
-    #   name                   = "addnodeauto"
-    #   vm_size                = "Standard_DS2_v2"
-    #   node_count             = 1
-    #   enable_host_encryption = false
-    #   enable_node_public_ip  = false
-    #   node_labels            = {}
-    #   os_type                = "Linux"
-    #   os_sku                 = "Ubuntu"
-    #   enable_auto_scaling    = false
-    #   max_count              = null
-    #   min_count              = null
-    #   os_disk_type           = "Managed"
-    #   os_disk_size_gb        = 50
-    #   node_taints            = [""]
-    #   max_pods               = 100
-    # }
   ]
 }
