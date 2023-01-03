@@ -1,5 +1,3 @@
-#PUBLIC CLUSTER EXAMPLE
-prefix                                      = "prefix"
 private_cluster_enabled                     = false
 vnet_subnet_id                              = "/subscriptions/xx/resourceGroups/xx/providers/Microsoft.Network/virtualNetworks/xx/subnets/xx"
 location                                    = "Central India"
@@ -13,16 +11,18 @@ agents_pool_name                            = "xx"
 agents_availability_zones                   = [1]
 aci_connector_linux_enabled                 = false
 resource_group_name                         = "xx"
-log_analytics_workspace_enabled             = true
-log_analytics_workspace_resource_group_name = "xx"
-cluster_log_analytics_workspace_name        = "xx"
 rbac_aad_managed                            = true
-log_analytics_workspace                     = null
-log_analytics_solution_id                   = null
 net_profile_docker_bridge_cidr              = "172.16.4.1/22"
 net_profile_service_cidr                    = "172.16.0.0/22"
 net_profile_dns_service_ip                  = "172.16.0.10"
 rbac_aad_admin_group_object_ids             = ["xx"]
+client_id                                   = ""
+client_secret                               = ""
+log_analytics_workspace                     = null
+log_analytics_solution_id                   = null
+log_analytics_workspace_enabled             = true
+log_analytics_workspace_resource_group_name = "xxxx"
+cluster_log_analytics_workspace_name        = "xxxxxxx"
 additional_node_groups = [{
   name                   = "manual"
   vm_size                = "Standard_DS2_v2"
@@ -56,9 +56,12 @@ additional_node_groups = [{
     os_disk_size_gb        = 50
     node_taints            = [""]
     max_pods               = 100
-}
+  }
 ]
-ingress_application_gateway_enabled = true
-ingress_application_gateway_name = "aigc"
+common_tags = {
+  environment = "dev"
+}
+ingress_application_gateway_enabled   = true
+ingress_application_gateway_name      = "aigc"
 ingress_application_gateway_subnet_id = "/subscriptions/xx/resourceGroups/xx/providers/Microsoft.Network/virtualNetworks/xx/subnets/xx"
 disk_encryption_set_id                = "/subscriptions/xx/resourceGroups/xx/providers/Microsoft.Compute/diskEncryptionSets/xx"

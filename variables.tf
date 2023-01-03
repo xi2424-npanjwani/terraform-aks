@@ -1,4 +1,9 @@
 # RESOURCE_GROUP
+variable "common_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Common Tags for every resource being created"
+}
 
 variable "resource_group_name" {
   type        = string
@@ -35,12 +40,6 @@ variable "api_server_authorized_ip_ranges" {
   type        = set(string)
   description = "(Optional) The IP ranges to allow for incoming traffic to the server nodes."
   default     = null
-}
-
-variable "prefix" {
-  type        = string
-  description = "The dns_prefix used"
-  default     = "prefix"
 }
 
 variable "disk_encryption_set_id" {
@@ -234,6 +233,7 @@ variable "vnet_subnet_id" {
 }
 
 #SERVICE_PRINCIPLE
+
 variable "client_id" {
   type        = string
   description = "(Optional) The Client ID (appId) for the Service Principal used for the AKS deployment"
@@ -249,6 +249,7 @@ variable "client_secret" {
 }
 
 #IDENTITY
+
 variable "identity_ids" {
   type        = list(string)
   description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster."
@@ -435,7 +436,21 @@ variable "rbac_aad_tenant_id" {
   default     = null
 }
 
-#LOG_ANALYTICS_WORKSPACE
+#LOG_ANALYTICS
+
+variable "cluster_log_analytics_workspace_name" {
+  type        = string
+  description = "(Optional) The name of the Analytics workspace"
+  default     = null
+}
+
+variable "log_analytics_solution_id" {
+  type        = string
+  description = "(Optional) Existing azurerm_log_analytics_solution ID. Providing ID disables creation of azurerm_log_analytics_solution."
+  default     = null
+  nullable    = true
+}
+
 variable "log_analytics_workspace" {
   type = object({
     id   = string
@@ -444,11 +459,6 @@ variable "log_analytics_workspace" {
   description = "(Optional) Existing azurerm_log_analytics_workspace to attach azurerm_log_analytics_solution. Providing the config disables creation of azurerm_log_analytics_workspace."
   default     = null
   nullable    = true
-}
-variable "cluster_log_analytics_workspace_name" {
-  type        = string
-  description = "(Optional) The name of the Analytics workspace"
-  default     = "default_workspace"
 }
 
 variable "log_analytics_workspace_enabled" {
@@ -471,17 +481,40 @@ variable "log_analytics_workspace_sku" {
   default     = "PerGB2018"
 }
 
-variable "log_analytics_solution_id" {
-  type        = string
-  description = "(Optional) Existing azurerm_log_analytics_solution ID. Providing ID disables creation of azurerm_log_analytics_solution."
-  default     = null
-  nullable    = true
-}
-
 variable "log_retention_in_days" {
   type        = number
   description = "The retention period for the logs in days"
   default     = 30
+}
+
+variable "solution_name" {
+  type        = string
+  default     = "ContainerInsights"
+  description = "The name of the log analytics solution created"
+}
+
+variable "plan_product" {
+  type        = string
+  default     = "OMSGallery/ContainerInsights"
+  description = "The product name of the solution. For example OMSGallery/Containers"
+}
+
+variable "plan_publisher" {
+  type        = string
+  default     = "Microsoft"
+  description = "The publisher of the solution"
+}
+
+variable "workspace_tags" {
+  type        = map(string)
+  description = "Any special tags that should be present on the workspace resource"
+  default     = {}
+}
+
+variable "solution_tags" {
+  type        = map(string)
+  description = "Any special tags that should be present on the solution resource"
+  default     = {}
 }
 
 variable "additional_node_groups" {
