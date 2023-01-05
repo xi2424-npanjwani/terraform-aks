@@ -11,24 +11,6 @@ locals {
   common_tags = var.common_tags
 }
 
-data "azurerm_kubernetes_service_versions" "current" {
-  location        = var.location
-  include_preview = false
-}
-
-
-moved {
-  from = module.ssh-key.tls_private_key.ssh
-  to   = tls_private_key.ssh[0]
-}
-
-resource "tls_private_key" "ssh" {
-  count = var.admin_username == null ? 0 : 1
-
-  algorithm = "RSA"
-  rsa_bits  = 2048
-}
-
 resource "azurerm_kubernetes_cluster" "main" {
   location                            = coalesce(var.location, data.azurerm_resource_group.main.location)
   name                                = var.cluster_name
@@ -38,7 +20,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   disk_encryption_set_id              = var.disk_encryption_set_id
   dns_prefix                          = var.cluster_name
   http_application_routing_enabled    = var.http_application_routing_enabled
-  kubernetes_version                  = data.azurerm_kubernetes_service_versions.current.latest_version
+  kubernetes_version                  = var.kubernetes_version
   local_account_disabled              = var.local_account_disabled
   node_resource_group                 = var.node_resource_group
   oidc_issuer_enabled                 = var.oidc_issuer_enabled
@@ -65,7 +47,6 @@ resource "azurerm_kubernetes_cluster" "main" {
       node_count                   = var.agents_count
       node_labels                  = var.agents_labels
       only_critical_addons_enabled = var.only_critical_addons_enabled
-      orchestrator_version         = var.orchestrator_version
       os_disk_size_gb              = var.os_disk_size_gb
       os_disk_type                 = var.os_disk_type
       tags                         = merge(var.tags, var.agents_tags)
@@ -74,6 +55,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       zones                        = var.agents_availability_zones
     }
   }
+
   dynamic "default_node_pool" {
     for_each = var.enable_auto_scaling == true ? ["default_node_pool_auto_scaled"] : []
 
@@ -88,7 +70,6 @@ resource "azurerm_kubernetes_cluster" "main" {
       min_count                    = var.agents_min_count
       node_labels                  = var.agents_labels
       only_critical_addons_enabled = var.only_critical_addons_enabled
-      orchestrator_version         = var.orchestrator_version
       os_disk_size_gb              = var.os_disk_size_gb
       os_disk_type                 = var.os_disk_type
       tags                         = merge(var.tags, var.agents_tags)
@@ -105,6 +86,8 @@ resource "azurerm_kubernetes_cluster" "main" {
       subnet_name = var.aci_connector_linux_subnet_name
     }
   }
+
+
   dynamic "azure_active_directory_role_based_access_control" {
     for_each = var.role_based_access_control_enabled && var.rbac_aad_managed ? ["rbac"] : []
 
@@ -115,6 +98,8 @@ resource "azurerm_kubernetes_cluster" "main" {
       tenant_id              = var.rbac_aad_tenant_id
     }
   }
+
+
   dynamic "azure_active_directory_role_based_access_control" {
     for_each = var.role_based_access_control_enabled && !var.rbac_aad_managed ? ["rbac"] : []
 
@@ -126,6 +111,8 @@ resource "azurerm_kubernetes_cluster" "main" {
       tenant_id         = var.rbac_aad_tenant_id
     }
   }
+
+
   dynamic "identity" {
     for_each = var.client_id == "" || var.client_secret == "" ? ["identity"] : []
 
@@ -134,6 +121,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       identity_ids = var.identity_ids
     }
   }
+
   dynamic "ingress_application_gateway" {
     for_each = var.ingress_application_gateway_enabled ? ["ingress_application_gateway"] : []
 
@@ -153,17 +141,20 @@ resource "azurerm_kubernetes_cluster" "main" {
       secret_rotation_interval = var.secret_rotation_interval
     }
   }
+
+
   dynamic "linux_profile" {
     for_each = var.admin_username == null ? [] : ["linux_profile"]
 
     content {
       admin_username = var.admin_username
-
       ssh_key {
-        key_data = replace(coalesce(var.public_ssh_key, tls_private_key.ssh[0].public_key_openssh), "\n", "")
+        key_data = file(var.public_ssh_key)
       }
     }
   }
+
+
   dynamic "microsoft_defender" {
     for_each = var.microsoft_defender_enabled ? ["microsoft_defender"] : []
 
@@ -171,6 +162,8 @@ resource "azurerm_kubernetes_cluster" "main" {
       log_analytics_workspace_id = coalesce(try(var.log_analytics_workspace.id, null), azurerm_log_analytics_workspace.main[0].id)
     }
   }
+
+
   network_profile {
     network_plugin     = var.network_plugin
     dns_service_ip     = var.net_profile_dns_service_ip
@@ -180,6 +173,8 @@ resource "azurerm_kubernetes_cluster" "main" {
     pod_cidr           = var.net_profile_pod_cidr
     service_cidr       = var.net_profile_service_cidr
   }
+
+
   dynamic "oms_agent" {
     for_each = var.log_analytics_workspace_enabled ? ["oms_agent"] : []
 
@@ -187,6 +182,8 @@ resource "azurerm_kubernetes_cluster" "main" {
       log_analytics_workspace_id = var.log_analytics_workspace == null ? azurerm_log_analytics_workspace.main[0].id : var.log_analytics_workspace.id
     }
   }
+
+
   dynamic "service_principal" {
     for_each = var.client_id != "" && var.client_secret != "" ? ["service_principal"] : []
 
@@ -207,6 +204,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       error_message = "If use identity and `UserAssigned` or `SystemAssigned, UserAssigned` is set, an `identity_ids` must be set as well."
     }
   }
+
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "additional_node_pool" {

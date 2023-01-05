@@ -82,17 +82,6 @@ output "cluster_identity" {
   value       = try(azurerm_kubernetes_cluster.main.identity[0], null)
 }
 
-output "generated_cluster_private_ssh_key" {
-  description = "The cluster will use this generated private key as ssh key when `var.public_ssh_key` is empty or null. Private key data in [PEM (RFC 1421)](https://datatracker.ietf.org/doc/html/rfc1421) format."
-  sensitive   = true
-  value       = try(azurerm_kubernetes_cluster.main.linux_profile[0], null) != null ? (var.public_ssh_key == "" || var.public_ssh_key == null ? tls_private_key.ssh[0].private_key_pem : null) : null
-}
-
-output "generated_cluster_public_ssh_key" {
-  description = "The cluster will use this generated public key as ssh key when `var.public_ssh_key` is empty or null. The fingerprint of the public key data in OpenSSH MD5 hash format, e.g. `aa:bb:cc:....` Only available if the selected private key format is compatible, similarly to `public_key_openssh` and the [ECDSA P224 limitations](https://registry.terraform.io/providers/hashicorp/tls/latest/docs#limitations)."
-  value       = try(azurerm_kubernetes_cluster.main.linux_profile[0], null) != null ? (var.public_ssh_key == "" || var.public_ssh_key == null ? tls_private_key.ssh[0].public_key_openssh : null) : null
-}
-
 output "host" {
   description = "The `host` in the `azurerm_kubernetes_cluster`'s `kube_config` block. The Kubernetes cluster server host."
   sensitive   = true
@@ -169,11 +158,6 @@ output "oms_agent" {
 output "oms_agent_enabled" {
   description = "Has the `azurerm_kubernetes_cluster` turned on `oms_agent` block?"
   value       = can(azurerm_kubernetes_cluster.main.oms_agent[0])
-}
-
-output "open_service_mesh_enabled" {
-  description = "(Optional) Is Open Service Mesh enabled? For more details, please visit [Open Service Mesh for AKS](https://docs.microsoft.com/azure/aks/open-service-mesh-about)."
-  value       = azurerm_kubernetes_cluster.main.open_service_mesh_enabled
 }
 
 output "password" {
