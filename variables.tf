@@ -398,7 +398,9 @@ variable "net_profile_service_cidr" {
 variable "private_dns_zone_id" {
   type        = string
   description = "(Optional) Either the ID of Private DNS Zone which should be delegated to this Cluster, `System` to have AKS manage this or `None`. In case of `None` you will need to bring your own DNS server and set up resolving, otherwise cluster will have issues after provisioning. Changing this forces a new resource to be created."
-  default     = "System"
+  default     = null
+  nullable    = true
+
 }
 
 ################################################################################
@@ -561,6 +563,7 @@ variable "additional_node_groups" {
     enable_host_encryption = bool
     enable_node_public_ip  = bool
     node_labels            = map(string)
+    priority               = string
     os_type                = string
     os_sku                 = string
     enable_auto_scaling    = bool

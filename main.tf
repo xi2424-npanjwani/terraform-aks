@@ -222,6 +222,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "additional_node_pool" {
   enable_host_encryption = var.additional_node_groups[count.index].enable_host_encryption
   vnet_subnet_id         = var.vnet_subnet_id
   zones                  = var.agents_availability_zones
+  priority               = var.additional_node_groups[count.index].priority
   os_type                = var.additional_node_groups[count.index].os_type
   os_sku                 = var.additional_node_groups[count.index].os_sku
   max_pods               = var.additional_node_groups[count.index].max_pods
