@@ -258,3 +258,4 @@ resource "azurerm_log_analytics_solution" "main" {
     publisher = var.plan_publisher
   }
 }
+

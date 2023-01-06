@@ -63,6 +63,7 @@ additional_node_groups = [{
 common_tags = {
   environment = "dev"
 }
+
 ingress_application_gateway_enabled   = true
 ingress_application_gateway_name      = "aigc"
 ingress_application_gateway_subnet_id = "/subscriptions/xx/resourceGroups/xx/providers/Microsoft.Network/virtualNetworks/xx/subnets/xx"
