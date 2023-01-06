@@ -1,11 +1,21 @@
+################################################################################
 # RESOURCE_GROUP
+################################################################################
+
+variable "common_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Common Tags for every resource being created"
+}
 
 variable "resource_group_name" {
   type        = string
   description = "The resource group name to be imported"
 }
 
-#KUBERNETES_CLUSTER
+################################################################################
+#  KUBERNETES_CLUSTER
+################################################################################
 
 variable "cluster_name" {
   type        = string
@@ -37,12 +47,6 @@ variable "api_server_authorized_ip_ranges" {
   default     = null
 }
 
-variable "prefix" {
-  type        = string
-  description = "The dns_prefix used"
-  default     = "prefix"
-}
-
 variable "disk_encryption_set_id" {
   type        = string
   description = "(Optional) The ID of the Disk Encryption Set which should be used for the Nodes and Volumes. More information [can be found in the documentation](https://docs.microsoft.com/azure/aks/azure-disk-customer-managed-keys). Changing this forces a new resource to be created."
@@ -70,7 +74,7 @@ variable "oidc_issuer_enabled" {
 variable "private_cluster_enabled" {
   type        = bool
   description = "If true cluster API server will be exposed only on internal IP address and available only in cluster vnet."
-  default     = false
+  default     = true
 }
 
 variable "private_cluster_public_fqdn_enabled" {
@@ -82,20 +86,15 @@ variable "private_cluster_public_fqdn_enabled" {
 variable "kubernetes_version" {
   type        = string
   description = "Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region"
-  default     = null
+  default     = "1.24"
 }
 
 variable "open_service_mesh_enabled" {
   type        = bool
   description = "Is Open Service Mesh enabled? For more details, please visit [Open Service Mesh for AKS](https://docs.microsoft.com/azure/aks/open-service-mesh-about)."
-  default     = null
+  default     = false
 }
 
-variable "orchestrator_version" {
-  type        = string
-  description = "Specify which Kubernetes release to use for the orchestration layer. The default used is the latest Kubernetes version available in the region"
-  default     = null
-}
 variable "local_account_disabled" {
   type        = bool
   description = "(Optional) - If `true` local accounts will be disabled. Defaults to `false`. See [the documentation](https://docs.microsoft.com/azure/aks/managed-aad#disable-local-accounts) for more information."
@@ -114,7 +113,10 @@ variable "tags" {
   default     = {}
 }
 
-#ADDON_PROFILE
+################################################################################
+#  ADDON_PROFILE
+################################################################################
+
 
 variable "aci_connector_linux_enabled" {
   description = "Enable Virtual Node pool"
@@ -134,11 +136,14 @@ variable "azure_policy_enabled" {
   default     = false
 }
 
-#DEFAULT_NODE_POOL
+################################################################################
+#  DEFAULT_NODE_POOL
+################################################################################
+
 variable "agents_availability_zones" {
   type        = list(string)
   description = "(Optional) A list of Availability Zones across which the Node Pool should be spread. Changing this forces a new resource to be created."
-  default     = [1, 2, 3]
+  default     = [1, 2]
 }
 
 variable "agents_count" {
@@ -162,7 +167,7 @@ variable "agents_max_count" {
 variable "agents_max_pods" {
   type        = number
   description = "(Optional) The maximum number of pods that can run on each agent. Changing this forces a new resource to be created."
-  default     = 100
+  default     = 110
 }
 
 variable "agents_min_count" {
@@ -181,7 +186,7 @@ variable "agents_pool_name" {
 variable "agents_size" {
   type        = string
   description = "The default virtual machine size for the Kubernetes agents"
-  default     = "Standard_D2s_v3"
+  default     = "Standard_DS2_v2"
 }
 
 variable "agents_tags" {
@@ -199,13 +204,13 @@ variable "agents_type" {
 variable "enable_auto_scaling" {
   type        = bool
   description = "Enable node pool autoscaling"
-  default     = false
+  default     = true
 }
 
 variable "enable_host_encryption" {
   type        = bool
   description = "Enable Host Encryption for default node pool. Encryption at host feature must be enabled on the subscription: https://docs.microsoft.com/azure/virtual-machines/linux/disks-enable-host-based-encryption-cli"
-  default     = false
+  default     = true
 }
 
 variable "enable_node_public_ip" {
@@ -233,22 +238,27 @@ variable "vnet_subnet_id" {
   default     = null
 }
 
-#SERVICE_PRINCIPLE
+################################################################################
+#  SERVICE_PRINCIPLE
+################################################################################
+
+
 variable "client_id" {
   type        = string
   description = "(Optional) The Client ID (appId) for the Service Principal used for the AKS deployment"
-  default     = null
-  nullable    = true
+  default     = ""
 }
 
 variable "client_secret" {
   type        = string
   description = "(Optional) The Client Secret (password) for the Service Principal used for the AKS deployment"
-  default     = null
-  nullable    = true
+  default     = ""
 }
 
-#IDENTITY
+################################################################################
+#  IDENTITY
+################################################################################
+
 variable "identity_ids" {
   type        = list(string)
   description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster."
@@ -266,7 +276,10 @@ variable "identity_type" {
   }
 }
 
-#INGRESS_APPGATEWAY
+################################################################################
+#  INGRESS_APPGATEWAY
+################################################################################
+
 variable "ingress_application_gateway_enabled" {
   type        = bool
   description = "Whether to deploy the Application Gateway ingress controller to this Kubernetes Cluster?"
@@ -298,7 +311,11 @@ variable "ingress_application_gateway_subnet_id" {
   default     = null
 }
 
-#MICROSOFT_DEFENDER
+################################################################################
+#  MICROSOFT_DEFENDER
+################################################################################
+
+
 variable "microsoft_defender_enabled" {
   type        = bool
   description = "(Optional) Is Microsoft Defender on the cluster enabled?"
@@ -306,7 +323,10 @@ variable "microsoft_defender_enabled" {
   nullable    = false
 }
 
-#KEY_VAULT_SECRETS_PROVIDER
+################################################################################
+#  KEY_VAULT_SECRETS_PROVIDER
+################################################################################
+
 variable "key_vault_secrets_provider_enabled" {
   type        = bool
   description = "(Optional) Whether to use the Azure Key Vault Provider for Secrets Store CSI Driver in an AKS cluster. For more details: https://docs.microsoft.com/en-us/azure/aks/csi-secrets-store-driver"
@@ -328,7 +348,10 @@ variable "secret_rotation_interval" {
   nullable    = false
 }
 
-#NETWORK_PROFILE
+################################################################################
+#  NETWORK_PROFILE
+################################################################################
+
 variable "network_plugin" {
   type        = string
   description = "Network plugin to use for networking."
@@ -378,7 +401,10 @@ variable "private_dns_zone_id" {
   nullable    = true
 }
 
-#LINUX_PROFILE
+################################################################################
+#  LINUX_PROFILE
+################################################################################
+
 variable "public_ssh_key" {
   type        = string
   description = "A custom ssh key to control access to the AKS cluster. Changing this forces a new resource to be created."
@@ -391,11 +417,14 @@ variable "admin_username" {
   default     = null
 }
 
-#AAD_RBAC
+################################################################################
+#  AAD_RBAC
+################################################################################
+
 variable "rbac_aad_managed" {
   type        = bool
   description = "Is the Azure Active Directory integration Managed, meaning that Azure will create/manage the Service Principal used for integration."
-  default     = false
+  default     = true
   nullable    = false
 }
 
@@ -435,7 +464,23 @@ variable "rbac_aad_tenant_id" {
   default     = null
 }
 
-#LOG_ANALYTICS_WORKSPACE
+################################################################################
+#  LOG_ANALYTICS
+################################################################################
+
+variable "cluster_log_analytics_workspace_name" {
+  type        = string
+  description = "(Optional) The name of the Analytics workspace"
+  default     = null
+}
+
+variable "log_analytics_solution_id" {
+  type        = string
+  description = "(Optional) Existing azurerm_log_analytics_solution ID. Providing ID disables creation of azurerm_log_analytics_solution."
+  default     = null
+  nullable    = true
+}
+
 variable "log_analytics_workspace" {
   type = object({
     id   = string
@@ -444,11 +489,6 @@ variable "log_analytics_workspace" {
   description = "(Optional) Existing azurerm_log_analytics_workspace to attach azurerm_log_analytics_solution. Providing the config disables creation of azurerm_log_analytics_workspace."
   default     = null
   nullable    = true
-}
-variable "cluster_log_analytics_workspace_name" {
-  type        = string
-  description = "(Optional) The name of the Analytics workspace"
-  default     = "default_workspace"
 }
 
 variable "log_analytics_workspace_enabled" {
@@ -471,18 +511,46 @@ variable "log_analytics_workspace_sku" {
   default     = "PerGB2018"
 }
 
-variable "log_analytics_solution_id" {
-  type        = string
-  description = "(Optional) Existing azurerm_log_analytics_solution ID. Providing ID disables creation of azurerm_log_analytics_solution."
-  default     = null
-  nullable    = true
-}
-
 variable "log_retention_in_days" {
   type        = number
   description = "The retention period for the logs in days"
   default     = 30
 }
+
+variable "solution_name" {
+  type        = string
+  default     = "ContainerInsights"
+  description = "The name of the log analytics solution created"
+}
+
+variable "plan_product" {
+  type        = string
+  default     = "OMSGallery/ContainerInsights"
+  description = "The product name of the solution. For example OMSGallery/Containers"
+}
+
+variable "plan_publisher" {
+  type        = string
+  default     = "Microsoft"
+  description = "The publisher of the solution"
+}
+
+variable "workspace_tags" {
+  type        = map(string)
+  description = "Any special tags that should be present on the workspace resource"
+  default     = {}
+}
+
+variable "solution_tags" {
+  type        = map(string)
+  description = "Any special tags that should be present on the solution resource"
+  default     = {}
+}
+
+################################################################################
+#  ADDITIONAL_NODE_GROUPS
+################################################################################
+
 
 variable "additional_node_groups" {
   description = "Map of AKS node group definitions to create"
@@ -493,6 +561,7 @@ variable "additional_node_groups" {
     enable_host_encryption = bool
     enable_node_public_ip  = bool
     node_labels            = map(string)
+    priority               = string
     os_type                = string
     os_sku                 = string
     enable_auto_scaling    = bool
