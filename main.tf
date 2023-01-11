@@ -3,18 +3,14 @@ provider "azurerm" {
   }
 }
 
-data "azurerm_resource_group" "main" {
-  name = var.resource_group_name
-}
-
 locals {
   common_tags = var.common_tags
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
-  location                            = coalesce(var.location, data.azurerm_resource_group.main.location)
+  location                            = var.location
   name                                = var.cluster_name
-  resource_group_name                 = data.azurerm_resource_group.main.name
+  resource_group_name                 = var.resource_group_name
   api_server_authorized_ip_ranges     = var.api_server_authorized_ip_ranges
   azure_policy_enabled                = var.azure_policy_enabled
   disk_encryption_set_id              = var.disk_encryption_set_id
@@ -235,7 +231,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "additional_node_pool" {
 resource "azurerm_log_analytics_workspace" "main" {
   count = var.log_analytics_workspace_enabled && var.log_analytics_workspace == null ? 1 : 0
 
-  location            = coalesce(var.location, data.azurerm_resource_group.main.location)
+  location            = var.location
   name                = var.cluster_log_analytics_workspace_name == null ? "${var.cluster_name}-workspace" : var.cluster_log_analytics_workspace_name
   resource_group_name = coalesce(var.log_analytics_workspace_resource_group_name, var.resource_group_name)
   retention_in_days   = var.log_retention_in_days
@@ -246,7 +242,7 @@ resource "azurerm_log_analytics_workspace" "main" {
 resource "azurerm_log_analytics_solution" "main" {
   count = var.log_analytics_workspace_enabled && var.log_analytics_solution_id == null ? 1 : 0
 
-  location              = coalesce(var.location, data.azurerm_resource_group.main.location)
+  location              = var.location
   resource_group_name   = coalesce(var.log_analytics_workspace_resource_group_name, var.resource_group_name)
   solution_name         = var.solution_name
   workspace_name        = var.log_analytics_workspace != null ? var.log_analytics_workspace.name : azurerm_log_analytics_workspace.main[0].name
